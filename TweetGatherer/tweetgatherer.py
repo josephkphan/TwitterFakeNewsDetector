@@ -1,21 +1,31 @@
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
+import key
+import time
 
 # ------------Keys for API---------- #
-consumerKey = 'eOOgZZpX8hmaPxIn0VoRbECil'
-consumerSecret = '7rLhBiVALul0IYKcqbx0DRBajzPtYofO5Iw2Szv25rWhqmXFkW'
-accessToken = '818157828921667584-6cTUK2RvwKdjpRevQ7msUE22sLcUUJi'
-accessSecret = 'SZBZKw10OAINbqQaCp5ZzUgQDXRPNkI2UhHDACmwafdIO'
+consumerKey = key.consumerKey
+consumerSecret = key.consumerSecret
+accessToken = key.accessToken
+accessSecret = key.accessSecret
 
 
 # Creating Listener class that will gather data from API
 class Listener(StreamListener):
-    def on_data(self, data):
-        print data
-        return True
 
-    # Happens when an error occurs
+    # Authentication worked and getting data
+    def on_data(self, data):
+        try:
+            print data
+            return True
+
+        # Could happen with bad internet... etc other errors
+        except BaseException, e:
+            print 'failed on_data,', str(e)
+            time.sleep(5)
+
+    # Happens when an error occurs - probably through a wrong key
     def on_error(self, status):
         print status
 
