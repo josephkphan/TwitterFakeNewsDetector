@@ -16,19 +16,29 @@ accessSecret = key.accessSecret
 # Creating Listener class that will gather data from API
 class Listener(StreamListener):
     # Authentication worked and getting data
+
     def on_data(self, str_data):
         try:
             # data from on_data initially comes in as string. Converts to json
-            print str_data
+            # print str_data
             data = json.loads(str_data)
 
             # Checking if keys exist in data
             if 'id' in data and 'text' in data and 'user' in data:
                 try:
-
-                    saveFile = open('TrumpData.txt', 'a')
+                    if key.tweetNum%1000 ==0:
+                        key.tweetNum +=1
+                        time.sleep(300)
+                    fileNum = int(key.tweetNum/10000)
+                    if key.curFileNum < fileNum:
+                        key.curFileNum = fileNum
+                        
+                        return True
+                    fileString = 'TrumpData'+ str(key.curFileNum) + '.txt' 
+                    saveFile = open(fileString, 'a')
                     saveFile.write(str_data)
                     saveFile.close()
+                    key.tweetNum+=1
                     return True
 
                 except BaseException, e:
