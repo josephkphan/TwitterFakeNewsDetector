@@ -1,13 +1,8 @@
-import tweepy
-from tweepy import Stream
-from tweepy import OAuthHandler
-from tweepy.streaming import StreamListener
-from tweepy.streaming import StreamListener
-from tweepy import OAuthHandler
-from tweepy import Stream
-import data
-import dataLoader
 import xlwt
+
+import tweepy
+from tweepy import OAuthHandler
+import TweetGatherer.Keys.data
 
 # ------------------ What you want to Find -------------------- #
 # How to use Keywords:
@@ -15,15 +10,18 @@ import xlwt
 # ex: "Car" will find anything with
 # ex: "Red Car" Will find anything with red and car in that exact format (i.e. This is a red car)
 # ex: "Red, Car" Will find anything with Red and Car in the same sentence (i.e. I have a Car. I have a Red Apple)
+# NOTE* Dates acn only go back 2 week in time!
 keywords = "Trump, insult, Disabilities"
 excelSheetName = "data.xls"
+beginSearchDate = "2017-02-20"
+endSearchDate = "2017-02-28"
 # textFileName = "data.txt"
 
 # ---------------- Access Keys ------------------#
-consumerKey = data.key['consumerKey']
-consumerSecret = data.key['consumerSecret']
-accessToken = data.key['accessToken']
-accessSecret = data.key['accessSecret']
+consumerKey = TweetGatherer.Keys.data.key['consumerKey']
+consumerSecret = TweetGatherer.Keys.data.key['consumerSecret']
+accessToken = TweetGatherer.Keys.data.key['accessToken']
+accessSecret = TweetGatherer.Keys.data.key['accessSecret']
 
 auth = OAuthHandler(consumerKey, consumerSecret)
 api = tweepy.API(auth)
@@ -85,6 +83,12 @@ def get_retweet_count(string):
     return text[0]
 
 
+def get_user_data(api, username):
+    user_data = api.get_user(username)
+    # print user_data
+    return user_data
+
+
 # ------------ Using Text File ------------- $
 # Use csv Writer
 # saveFile = open(fileString, 'a')
@@ -114,14 +118,17 @@ sheet1.write(0, 11, "List Count")
 counter = 1
 for tweet in tweepy.Cursor(api.search,
                            q= keywords,
-                           since="2017-02-10",
-                           until="2017-02-22",
+                           since="2017-02-20",
+                           until="2017-02-28",
                            lang="en").items(10000):
     tweet_string = str(tweet)
+    # print "--------------------"
+    # print tweet_string
+    # print "--------------------"
 
     # Used to Skip "Reply Tweets"
-    # if tweet_string.find('RT') > 0:         # Returns index if found. Returns -1 if not found
-    #     continue
+    if tweet_string.find('RT') > 0:         # Returns index if found. Returns -1 if not found
+        continue
 
     # Parsing through Tweet for data
     tweet_data = {}
@@ -151,12 +158,6 @@ for tweet in tweepy.Cursor(api.search,
     # Writing to Text File
     # saveFile.write(str(tweet))
     # saveFile.write('\n')
-
-    # Print out to Console
-    print tweet_data
-    print '------------------------------------------------------'
-    # print tweet_data['text']
-    # print len(tweet_data['text'].split())
 
 book.save(excelSheetName)
 # saveFile.close()

@@ -1,10 +1,11 @@
 import json
+
 import data
 
 
 def get_keys():
     try:
-        with open('key.json') as f:
+        with open('Keys/key.json') as f:
             data.key = json.load(f)
     except IOError as e:
         print "Unable to open key file"  # Does not exist OR no read permissions
